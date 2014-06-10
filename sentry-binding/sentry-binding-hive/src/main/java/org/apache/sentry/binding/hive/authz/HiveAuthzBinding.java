@@ -159,7 +159,7 @@ public class HiveAuthzBinding {
     }
     String defaultUmask = hiveConf.get(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY);
     if("077".equalsIgnoreCase(defaultUmask)) {
-      LOG.error("HiveServer2 required a default umask of 077");
+      LOG.error("077 mask doesn't work with Sentry");
       return new NoAuthorizationProvider();
     }
     // get the provider class and resources from the authz config
