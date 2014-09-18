@@ -328,6 +328,7 @@ limitations under the License.
                     mv $BASE_DIR/${finalName}* $BASE_DIR/$finalName
                   }
                   mkdir -p $DOWNLOAD_DIR
+                  export http_proxy=http://proxy01.cd.intel.com:911
                   download "http://nightly.cloudera.com/cdh5/cdh/5/hadoop-latest.tar.gz" hadoop.tar.gz hadoop
                   download "http://nightly.cloudera.com/cdh5/cdh/5/hive-latest.tar.gz" hive.tar.gz hive
                 </echo>
