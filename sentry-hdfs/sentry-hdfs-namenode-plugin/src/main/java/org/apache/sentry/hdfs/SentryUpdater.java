@@ -40,7 +40,7 @@ public class SentryUpdater {
       try {
         sentryClient = SentryHDFSServiceClientFactory.create(conf);
       } catch (Exception e) {
-        LOG.error("Error connecting to Sentry ['{}'] !!",
+        LOG.error("Error connecting to Sentry !!",
             e.getMessage());
         sentryClient = null;
         return null;
