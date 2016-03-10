@@ -406,7 +406,7 @@ public class SentryStore {
   }
 
   public CommitContext alterSentryRoleGrantPrivilege(String grantorPrincipal, String roleName,
-      TSentryPrivilege privilege, boolean checkGrantOption) throws SentryUserException {
+      TSentryPrivilege privilege) throws SentryUserException {
     return alterSentryRoleGrantPrivileges(grantorPrincipal, roleName, Sets.newHashSet(privilege));
   }
 
