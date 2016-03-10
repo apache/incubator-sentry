@@ -405,25 +405,23 @@ public class SentryStore {
     }
   }
 
-  public CommitContext alterSentryRoleGrantPrivilege(String grantorPrincipal,
-      String roleName, TSentryPrivilege privilege)
-      throws SentryUserException {
-    return alterSentryRoleGrantPrivileges(grantorPrincipal,
-        roleName, Sets.newHashSet(privilege));
+  public CommitContext alterSentryRoleGrantPrivilege(String grantorPrincipal, String roleName,
+      TSentryPrivilege privilege, boolean checkGrantOption) throws SentryUserException {
+    return alterSentryRoleGrantPrivileges(grantorPrincipal, roleName, Sets.newHashSet(privilege));
   }
 
-  public CommitContext alterSentryRoleGrantPrivileges(String grantorPrincipal,
-      String roleName, Set<TSentryPrivilege> privileges)
-      throws SentryUserException {
+  public CommitContext alterSentryRoleGrantPrivileges(String grantorPrincipal, String roleName,
+      Set<TSentryPrivilege> privileges) throws SentryUserException {
     boolean rollbackTransaction = true;
     PersistenceManager pm = null;
     roleName = trimAndLower(roleName);
     try {
       pm = openTransaction();
       for (TSentryPrivilege privilege : privileges) {
-        // first do grant check
-        grantOptionCheck(pm, grantorPrincipal, privilege);
-
+        if (privilege.isCheckGrantOperation()) {
+          // first do grant check
+          grantOptionCheck(pm, grantorPrincipal, privilege);
+        }
         MSentryPrivilege mPrivilege = alterSentryRoleGrantPrivilegeCore(pm, roleName, privilege);
 
         if (mPrivilege != null) {
@@ -498,23 +496,23 @@ public class SentryStore {
     return mPrivilege;
   }
 
-  public CommitContext alterSentryRoleRevokePrivilege(String grantorPrincipal,
-      String roleName, TSentryPrivilege tPrivilege) throws SentryUserException {
-    return alterSentryRoleRevokePrivileges(grantorPrincipal,
-        roleName, Sets.newHashSet(tPrivilege));
+  public CommitContext alterSentryRoleRevokePrivilege(String grantorPrincipal, String roleName,
+      TSentryPrivilege tPrivilege) throws SentryUserException {
+    return alterSentryRoleRevokePrivileges(grantorPrincipal, roleName, Sets.newHashSet(tPrivilege));
   }
 
-  public CommitContext alterSentryRoleRevokePrivileges(String grantorPrincipal,
-      String roleName, Set<TSentryPrivilege> tPrivileges) throws SentryUserException {
-    boolean rollbackTransaction = true;
+  public CommitContext alterSentryRoleRevokePrivileges(String grantorPrincipal, String roleName,
+      Set<TSentryPrivilege> tPrivileges) throws SentryUserException {
+   boolean rollbackTransaction = true;
     PersistenceManager pm = null;
     roleName = safeTrimLower(roleName);
     try {
       pm = openTransaction();
       for (TSentryPrivilege tPrivilege : tPrivileges) {
-        // first do revoke check
-        grantOptionCheck(pm, grantorPrincipal, tPrivilege);
-
+        if (tPrivilege.isCheckGrantOperation()) {
+          // first do revoke check
+          grantOptionCheck(pm, grantorPrincipal, tPrivilege);
+        }
         alterSentryRoleRevokePrivilegeCore(pm, roleName, tPrivilege);
       }
 

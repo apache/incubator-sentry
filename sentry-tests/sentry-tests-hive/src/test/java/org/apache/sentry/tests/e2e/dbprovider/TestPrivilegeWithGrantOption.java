@@ -54,6 +54,7 @@ public class TestPrivilegeWithGrantOption extends AbstractTestWithStaticConfigur
         DummySentryOnFailureHook.class.getName());
       isInternalServer = true;
     }
+    enableSessionAuthenticator = true;
     AbstractTestWithStaticConfiguration.setupTestStaticConfiguration();
   }
 
