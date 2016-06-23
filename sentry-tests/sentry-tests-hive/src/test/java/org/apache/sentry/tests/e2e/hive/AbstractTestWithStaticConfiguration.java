@@ -45,6 +45,7 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.ql.security.SessionStateUserAuthenticator;
 import org.apache.sentry.binding.hive.SentryHiveAuthorizationTaskFactoryImpl;
 import org.apache.sentry.binding.metastore.SentryMetastorePostEventListener;
 import org.apache.sentry.core.model.db.DBModelAction;
@@ -127,6 +128,7 @@ public abstract class AbstractTestWithStaticConfiguration {
   protected static boolean enableHiveConcurrency = false;
   // indicate if the database need to be clear for every test case in one test class
   protected static boolean clearDbPerTest = true;
+  protected static boolean enableSessionAuthenticator = false;
 
   protected static File baseDir;
   protected static File logDir;
@@ -238,6 +240,10 @@ public abstract class AbstractTestWithStaticConfiguration {
     }
     if (testServerType != null) {
       properties.put("sentry.e2etest.hiveServer2Type", testServerType);
+    }
+    if (enableSessionAuthenticator) {
+      properties.put(HiveConf.ConfVars.HIVE_AUTHENTICATOR_MANAGER.varname,
+          SessionStateUserAuthenticator.class.getName());
     }
     baseDir = Files.createTempDir();
     LOGGER.info("BaseDir = " + baseDir);

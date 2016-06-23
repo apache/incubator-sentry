@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.ql.exec.TaskFactory;
 import org.apache.hadoop.hive.ql.hooks.ReadEntity;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
@@ -60,8 +61,10 @@ public class SentryHiveAuthorizationTaskFactoryImpl implements HiveAuthorization
 
   private static final Logger LOG = LoggerFactory.getLogger(SentryHiveAuthorizationTaskFactoryImpl.class);
 
-  public SentryHiveAuthorizationTaskFactoryImpl(HiveConf conf, Hive db) { //NOPMD
+  private final Hive db;
 
+  public SentryHiveAuthorizationTaskFactoryImpl(HiveConf conf, Hive db) { //NOPMD
+    this.db = db;
   }
 
   @Override
@@ -295,6 +298,17 @@ public class SentryHiveAuthorizationTaskFactoryImpl implements HiveAuthorization
           subject.setTable(true);
           String[] qualified = BaseSemanticAnalyzer.getQualifiedTableName(gchild);
           subject.setObject(qualified[1]);
+          try {
+            subject.setOwner(db.getTable(qualified[1]).getOwner());
+          } catch (HiveException e) {
+            // Ignore the exception.
+          }
+        } else if (astChild.getToken().getType() == HiveParser.TOK_DB_TYPE) {
+          try {
+            subject.setOwner(db.getDatabase(privilegeObject).getOwnerName());
+          } catch (HiveException e) {
+            // Ignore the exception.
+          }
         }
       for (int i = 1; i < astChild.getChildCount(); i++) {
         gchild = (ASTNode) astChild.getChild(i);
